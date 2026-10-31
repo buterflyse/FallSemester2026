@@ -1,0 +1,214 @@
+---
+title: "Unemployment By United States Metro Area Over The Last 11 Months."
+author: "Buterflyse"
+date: "2026-10-16"
+output: 
+  html_document:
+    df_print: paged
+  pdf_document: default
+---
+
+```{r load-csv, include=FALSE}
+unemployment <- read.csv("2025-11-01 to 2026-08-01 Unemployment Rate by Metropolitan Statistical Area (Percent).csv", na.strings = c("NA", ""))
+```
+## Introduction: 
+
+  Unemployment is an important economic indicator that provides insight into the health of the labor market. By examining unemployment data across metropolitan areas, we can better understand differences in employment conditions and identify changes in local economies over time.
+
+  This analysis uses data obtained from the Federal Reserve Bank of St. Louis's Federal Reserve Economic Data (FRED) database. This file is used to explore unemployment trends across metropolitan areas over the selected time period. This analysis will summarize the data, identify patterns and changes in unemployment, and use visualizations to compare trends. The goal is to better understand how unemployment varies across metropolitan areas and how these patterns change from November 1st of 2025 to October 1st of 2026.
+
+Data source: <https://fred.stlouisfed.org/graph/?m=1wm8j#>
+
+Citation: U.S. Bureau of Labor Statistics, Unemployment Rate in St. Louis, MO-IL (MSA) [STLUR], retrieved from FRED, Federal Reserve Bank of St. Louis; https://fred.stlouisfed.org/series/STLUR, October 16, 2026.
+
+## General Data Set Information:
+
+The information displayed below will contain the name of all of the columns, number of columns and rows and the structure of the dataset in their respective order:
+```{r General Dataset Information, echo=FALSE}
+colnames(unemployment)
+ncol(unemployment)
+nrow(unemployment)
+str(unemployment)
+```
+
+List of the included Metro Areas and their region codes within the dataset:
+```{r Metro Area List, echo=FALSE}
+unemployment[,4:5]
+```
+
+
+## Regional Unemployment Averages By Month in the U.S.:
+
+  The bar graph below displays the mean of all the metro regions percentages and how it changes by month from 11/1/2025 to 10/1/2026. Something to note is that since November of 2025, the United State's Metro Regions have seen a steady decline in the average number of persons who are unemployed in each region when compared to the populations of each region. This information is useful, however, it does not actually tell us if we are looking at an increase in population without an increase in unemployment, a decrease in unemployment without an increase in population, or even if certain regions went up but others had a greater change in unemployment in the opposite direction.
+```{r National mean unemployment percentage month by month:, echo=FALSE}
+nov25 <- mean(unemployment[,6], na.rm = TRUE)
+dec25 <- mean(unemployment[,7], na.rm = TRUE)
+jan26 <- mean(unemployment[,8], na.rm = TRUE)
+feb26 <- mean(unemployment[,9], na.rm = TRUE)
+mar26 <- mean(unemployment[,10], na.rm = TRUE)
+apr26 <- mean(unemployment[,11], na.rm = TRUE)
+jun26 <- mean(unemployment[,12], na.rm = TRUE)
+jul26 <- mean(unemployment[,13], na.rm = TRUE)
+aug26 <- mean(unemployment[,14], na.rm = TRUE)
+sep26 <- mean(unemployment[,15], na.rm = TRUE)
+
+monthNatAvg <- c(nov25, dec25, jan26, feb26, mar26, apr26, jun26, jul26, aug26, sep26)
+
+months <- c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug")
+
+barplot(
+  monthNatAvg - 4,
+  names.arg = months,
+  main = "Average Regional Unemployment Percentage by Month",
+  xlab = "Month and Year",
+  ylab = "Mean Unemployment Percentage (%)",
+  col = "steelblue",
+  border = "white",
+  ylim = c(0, 1),
+  offset = 0,
+  las = 2,
+  cex.names = 0.8,
+  yaxt = "n"
+)
+axis(
+  2,
+  at = seq(0, 1, by = 0.1),
+  labels = sprintf("%.1f%%", seq(4, 5, by = 0.1)),
+  las = 1
+)
+```
+
+
+  The bar plot below tells a very similar story to the one above, the difference being that instead of measuring the mean of the percentages, I wanted to see if the median was any different. You can see that the decline of the population being unemployed occurs, however, in this case it takes significantly longer to decline and is only really visible towards the end of the graph.
+  
+
+```{r National median unemployment percentage month by month:, echo=FALSE}
+medNov25 <- median(unemployment[,6], na.rm = TRUE)
+medDec25 <- median(unemployment[,7], na.rm = TRUE)
+medJan26 <- median(unemployment[,8], na.rm = TRUE)
+medFeb26 <- median(unemployment[,9], na.rm = TRUE)
+medMar26 <- median(unemployment[,10], na.rm = TRUE)
+medApr26 <- median(unemployment[,11], na.rm = TRUE)
+medJun26 <- median(unemployment[,12], na.rm = TRUE)
+medJul26 <- median(unemployment[,13], na.rm = TRUE)
+medAug26 <- median(unemployment[,14], na.rm = TRUE)
+medSep26 <- median(unemployment[,15], na.rm = TRUE)
+
+monthNatMed <- c(medNov25, medDec25, medJan26, medFeb26, medMar26, medApr26, medJun26, medJul26, medAug26, medSep26)
+
+months <- c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug")
+
+barplot(
+  monthNatMed,
+  names.arg = months,
+  main = "Average Regional Unemployment Percentage by Month",
+  xlab = "Month and Year",
+  ylab = "Median Unemployment Percentage (%)",
+  col = "steelblue",
+  border = "white",
+  ylim = c(0, 5),
+  offset = 0,
+  las = 2,
+  cex.names = 0.8,
+  yaxt = "n"
+)
+axis(
+  2,
+  at = seq(0, 5, by = 0.1),
+  labels = sprintf("%.1f%%", seq(0, 5, by = 0.1)),
+  las = 1
+)
+```
+
+
+## Regional Unemployment Percentages By Month For Sample Regions:
+
+  Since the general country wide information doesn't really tell a detailed story, I want to know if within specific selected regions, the precentage of citizens within a metro region remains in a downward slope. For this test I have selected New York City's region, Chicago's region, and Los Angeles's region since that would cover the East Coast, Midwest, and Pacific greater regions of the country below in their respective order. We can tell that from the information provided below, that New York City's and LA's numbers show that there is a steady decline over the last year of unemployed individuals amongst their region, this so far agrees with our original story. Chicago's numbers, however, tell a different story that confirms that the national data shows a decline of unemployed individuals in which the decline is greater than the amount of regional inclines but both exist within the dataset.
+  
+### New York City:
+
+
+```{r New York City Metro Area, echo=FALSE}
+newYorkData <- unemployment[unemployment[,5]==35620, 6:15]
+months <- c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug")
+
+barplot(
+  as.numeric(newYorkData),
+  names.arg = months,
+  main = "New York Metro Area Unemployment Percentage by Month",
+  xlab = "Month and Year",
+  ylab = "Unemployment Percentage (%)",
+  col = "steelblue",
+  border = "white",
+  ylim = c(0, 5),
+  offset = 0,
+  las = 2,
+  cex.names = 0.8,
+  yaxt = "n"
+)
+axis(
+  2,
+  at = seq(0, 5, by = 0.1),
+  labels = sprintf("%.1f%%", seq(0, 5, by = 0.1)),
+  las = 1
+)
+
+```
+
+### Chicago Illinois:
+
+```{r Chicago Land Area Metro Area, echo=FALSE}
+chicagoLandData <- unemployment[unemployment[,5]==16980	, 6:15]
+months <- c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug")
+
+barplot(
+  as.numeric(chicagoLandData),
+  names.arg = months,
+  main = "Chicago Land Area Unemployment Percentage by Month",
+  xlab = "Month and Year",
+  ylab = "Unemployment Percentage (%)",
+  col = "steelblue",
+  border = "white",
+  ylim = c(0, 5),
+  offset = 0,
+  las = 2,
+  cex.names = 0.8,
+  yaxt = "n"
+)
+axis(
+  2,
+  at = seq(0, 5, by = 0.1),
+  labels = sprintf("%.1f%%", seq(0, 5, by = 0.1)),
+  las = 1
+)
+```
+
+### Los Angeles:
+
+
+
+```{r LA Metro Area, echo=FALSE}
+losAngelesData <- unemployment[unemployment[,5]==31080	, 6:15]
+months <- c("Nov", "Dec", "Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug")
+
+barplot(
+  as.numeric(losAngelesData),
+  names.arg = months,
+  main = "LA Area Unemployment Percentage by Month",
+  xlab = "Month and Year",
+  ylab = "Unemployment Percentage (%)",
+  col = "steelblue",
+  border = "white",
+  ylim = c(0, 5),
+  offset = 0,
+  las = 2,
+  cex.names = 0.8,
+  yaxt = "n"
+)
+axis(
+  2,
+  at = seq(0, 5, by = 0.1),
+  labels = sprintf("%.1f%%", seq(0, 5, by = 0.1)),
+  las = 1
+)
+```

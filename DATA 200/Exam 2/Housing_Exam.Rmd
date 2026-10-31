@@ -1,0 +1,106 @@
+---
+title: "DATA 200: Housing Data Exam"
+author: "Buterflyse"
+output: html_document
+---
+
+Keep `housing.csv` in the same folder. Complete the code chunks and written answers below. Knit to Word and submit the `.docx` file to Canvas. Include code, output, plots, and explanations.
+
+Each row is a housing record. Columns: `city`, `price` (US dollars), and `area_sqft` (living area in square feet). Some prices are missing in this exam version. Do not delete rows.
+
+## Starting code
+
+```{r load-data}
+housing <- read.csv("housing.csv", na.strings = c("NA", ""))
+colnames(housing)
+head(housing)
+```
+
+## Problem 1: Inspect the data
+
+**a.** Display the structure of `housing`.
+
+```{r problem-1-a}
+str(housing)
+```
+
+**b.** Use an appropriate function to find the number of rows and columns in the data set.
+
+```{r problem-1-b}
+dim(housing)
+```
+
+**c.** Count the missing values in `price`.
+
+```{r problem-1-c}
+sum(is.na(housing$price))
+```
+
+
+## Problem 2: House sizes
+
+**a.** Select `area_sqft` column and save it as `area`.
+
+```{r problem-2-a}
+sum(is.na(housing$area_sqft))
+area <- housing$area_sqft
+```
+
+**b.** Calculate the mean and sample standard deviation of `area`.
+
+```{r problem-2-b}
+mean(area, na.rm=TRUE)
+sd(area, na.rm=TRUE)
+```
+
+**c.** Create a histogram of `area`. Include a descriptive title and label the horizontal axis with units.
+
+```{r problem-2-c}
+hist(area,
+     main = "Area of Housing",
+     xlab = "Area (Sq.ft.)",
+     col = "green"
+     )
+```
+
+**d.** Describe the distribution of the histogram. What conclusions can you draw from the histogram, the mean, and the standard deviation?
+
+Your answer:
+The distribution of the histogram displays a right skewed graph where the mean must be greater than the median. That tells us that most of the houses are closer to the 2000 sq.ft size while the greater the size of the house, the less of them there seem to be. The Standard Deviation tells us that the difference between houses is typically very large.
+
+
+
+## Problem 3: Compare cities
+
+**a.** Create and display a frequency table of `city`.
+
+```{r problem-3-a}
+sum(is.na(housing$city))
+city <- housing$city
+city_count <- table(city)
+city_count
+```
+
+**b.** Use that table to create a bar plot with a descriptive title and axis labels.
+
+```{r problem-3-b}
+barplot(city_count,
+        main = "Number of houses by city",
+        xlab = "Cities",
+        ylab = "number of houses",
+        col = "orange"
+)
+```
+
+**c.** Use `aggregate()` to calculate the mean of `price` for each city. Ignore missing prices and summarize only this one numerical column.
+
+```{r problem-3-c}
+aggregate(housing$price,
+          by = list(group = housing$city),
+          FUN = mean, na.rm = TRUE
+)
+```
+
+**d.** Identify the city with the most records and the city with the highest mean price. Does the higher mean prove that every house in that city costs more than every house in the other cities? Explain.
+
+Your answer: The city that has the most recorded houses is Seattle by an extensive amount and the city that has the highest mean price per house would be Bellevue. I believe this does not prove that every house in Bellvue costs more than every house in the other cities because Seattle has a much larger amount of houses and so that means that there will be a larger range of house prices. My conclusion is that Seattle might have a few houses or many houses that are more expensive but also houses that are much cheaper bringing down the mean to below the mean of Bellevue. It is more likeley that Bellevue's houses are almost all more expensive than Renton but might not be for the same reason even though the population is similar. Who is to say that Renton doesn't have 2 super expensive houses and a bunch of cheap ones?

@@ -1,0 +1,271 @@
+---
+title: "Penguins: Analysis by Island"
+author: "Buterflyse"
+output: html_document
+---
+
+## 1. Load the data
+
+Keep **penguins.csv** in the same folder as this R Markdown file. Run the chunks in order, then knit to Word. All commands use base R.
+
+```{r load-data}
+penguins <- read.csv("penguins.csv", na.strings = c("NA", ""))
+colnames(penguins)
+```
+
+## 2. Check and remove missing island values
+
+Count missing species labels. `is.na()` identifies missing values, and `sum()` counts them. A count of zero means no species labels are missing.
+
+```{r check-missing-island}
+sum(is.na(penguins$island))
+```
+
+Keep rows where island is not missing. The `!` means "not"; the comma keeps all columns. If no species labels are missing, this leaves the data unchanged. It does not change the CSV file.
+
+```{r remove-missing-species}
+penguins <- penguins[!is.na(penguins$island), ]
+sum(is.na(penguins$island))
+```
+
+Only missing **species labels** are removed here. We do not remove rows because sex is missing. Use `na.rm = TRUE` to ignore missing numerical measurements in calculations.
+
+## 3. Review plots
+
+The red line marks the mean. These histograms combine all islands.
+
+### Bill length
+
+```{r review-bill_length_mm, fig.width=6, fig.height=4}
+hist(penguins$bill_length_mm,
+     main = "Bill length: all islands",
+     xlab = "Bill length (mm)",
+     col = "lightblue", border = "white")
+abline(v = mean(penguins$bill_length_mm, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+### Bill depth
+
+```{r review-bill_depth_mm, fig.width=6, fig.height=4}
+hist(penguins$bill_depth_mm,
+     main = "Bill depth: all islands",
+     xlab = "Bill depth (mm)",
+     col = "lightblue", border = "white")
+abline(v = mean(penguins$bill_depth_mm, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+### Flipper length
+
+```{r review-flipper_length_mm, fig.width=6, fig.height=4}
+hist(penguins$flipper_length_mm,
+     main = "Flipper length: all islands",
+     xlab = "Flipper length (mm)",
+     col = "lightblue", border = "white")
+abline(v = mean(penguins$flipper_length_mm, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+### Body mass
+
+```{r review-body_mass_g, fig.width=6, fig.height=4}
+hist(penguins$body_mass_g,
+     main = "Body mass: all islands",
+     xlab = "Body mass (g)",
+     col = "lightblue", border = "white")
+abline(v = mean(penguins$body_mass_g, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+### Counts by species
+
+```{r species-barplot, fig.width=6, fig.height=4}
+island_counts <- table(penguins$island)
+island_counts
+
+barplot(island_counts,
+        main = "Number of penguins by Island",
+        xlab = "Species", ylab = "Number of penguins",
+        col = c("lightblue", "lightgreen", "lightpink"))
+```
+
+## 4. Calculate statistics by species
+
+Select the same four measurement columns. Length measurements use millimeters; body mass uses grams.
+
+```{r select-measurements}
+measurements <- penguins[, c("bill_length_mm", "bill_depth_mm",
+                             "flipper_length_mm", "body_mass_g")]
+```
+
+As in the sex analysis, `aggregate()` repeats a calculation for each group. The grouping variable is now `species`. Each table has one row per species and one column per measurement.
+
+### Mean
+
+```{r island-mean}
+aggregate(measurements,
+          by = list(species = penguins$island),
+          FUN = mean, na.rm = TRUE)
+```
+
+### Median
+
+```{r island-median}
+aggregate(measurements,
+          by = list(species = penguins$island),
+          FUN = median, na.rm = TRUE)
+```
+
+### Sample variance
+
+```{r island-var}
+aggregate(measurements,
+          by = list(species = penguins$island),
+          FUN = var, na.rm = TRUE)
+```
+
+### Sample standard deviation
+
+```{r island-sd}
+aggregate(measurements,
+          by = list(species = penguins$island),
+          FUN = sd, na.rm = TRUE)
+```
+
+`var()` and `sd()` calculate sample statistics using n - 1. SD has the original measurement's units; variance has squared units. Each column's calculation uses its available measurements.
+
+## 5. Filter the three species
+
+Species labels are case-sensitive: use `Adelie`, `Chinstrap`, and `Gentoo` exactly as shown. The comma selects matching rows and keeps all columns.
+
+```{r filter-island}
+biscoe_data <- penguins[penguins$island == "Biscoe", ]
+dream_data <- penguins[penguins$island == "Dream", ]
+torgersen_data <- penguins[penguins$island == "Torgersen", ]
+
+nrow(biscoe_data)
+nrow(dream_data)
+nrow(torgersen_data)
+```
+
+## 6. Compare distributions
+
+Make separate histograms with a red line at each group's mean. R chooses bins and axes automatically, so check the axis values when comparing plots. Bar heights are counts and depend on group size; a taller bar alone does not imply less variation.
+
+### Bill length
+
+```{r biscoe-bill_length_mm, fig.width=6, fig.height=4}
+hist(biscoe_data$bill_length_mm,
+     main = "Bill length: Biscoe penguins",
+     xlab = "Bill length (mm)",
+     col = "lightblue", border = "white")
+abline(v = mean(biscoe_data$bill_length_mm, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+```{r dream-bill_length_mm, fig.width=6, fig.height=4}
+hist(dream_data$bill_length_mm,
+     main = "Bill length: Dream penguins",
+     xlab = "Bill length (mm)",
+     col = "lightgreen", border = "white")
+abline(v = mean(dream_data$bill_length_mm, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+```{r torgersen-bill_length_mm, fig.width=6, fig.height=4}
+hist(torgersen_data$bill_length_mm,
+     main = "Bill length: Torgersen penguins",
+     xlab = "Bill length (mm)",
+     col = "lightpink", border = "white")
+abline(v = mean(torgersen_data$bill_length_mm, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+### Bill depth
+
+```{r biscoe-bill_depth_mm, fig.width=6, fig.height=4}
+hist(biscoe_data$bill_depth_mm,
+     main = "Bill depth: Biscoe penguins",
+     xlab = "Bill depth (mm)",
+     col = "lightblue", border = "white")
+abline(v = mean(biscoe_data$bill_depth_mm, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+```{r dream-bill_depth_mm, fig.width=6, fig.height=4}
+hist(dream_data$bill_depth_mm,
+     main = "Bill depth: Dream penguins",
+     xlab = "Bill depth (mm)",
+     col = "lightgreen", border = "white")
+abline(v = mean(dream_data$bill_depth_mm, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+```{r torgersen-bill_depth_mm, fig.width=6, fig.height=4}
+hist(torgersen_data$bill_depth_mm,
+     main = "Bill depth: Torgersen penguins",
+     xlab = "Bill depth (mm)",
+     col = "lightpink", border = "white")
+abline(v = mean(torgersen_data$bill_depth_mm, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+### Flipper length
+
+```{r biscoe-flipper_length_mm, fig.width=6, fig.height=4}
+hist(biscoe_data$flipper_length_mm,
+     main = "Flipper length: Biscoe penguins",
+     xlab = "Flipper length (mm)",
+     col = "lightblue", border = "white")
+abline(v = mean(biscoe_data$flipper_length_mm, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+```{r dream-flipper_length_mm, fig.width=6, fig.height=4}
+hist(dream_data$flipper_length_mm,
+     main = "Flipper length: Dream penguins",
+     xlab = "Flipper length (mm)",
+     col = "lightgreen", border = "white")
+abline(v = mean(dream_data$flipper_length_mm, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+```{r torgersen-flipper_length_mm, fig.width=6, fig.height=4}
+hist(torgersen_data$flipper_length_mm,
+     main = "Flipper length: Torgersen penguins",
+     xlab = "Flipper length (mm)",
+     col = "lightpink", border = "white")
+abline(v = mean(torgersen_data$flipper_length_mm, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+### Body mass
+
+```{r biscoe-body_mass_g, fig.width=6, fig.height=4}
+hist(biscoe_data$body_mass_g,
+     main = "Body mass: Biscoe penguins",
+     xlab = "Body mass (g)",
+     col = "lightblue", border = "white")
+abline(v = mean(biscoe_data$body_mass_g, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+```{r dream-body_mass_g, fig.width=6, fig.height=4}
+hist(dream_data$body_mass_g,
+     main = "Body mass: Dream penguins",
+     xlab = "Body mass (g)",
+     col = "lightgreen", border = "white")
+abline(v = mean(dream_data$body_mass_g, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
+```{r torgersen-body_mass_g, fig.width=6, fig.height=4}
+hist(torgersen_data$body_mass_g,
+     main = "Body mass: Torgersen penguins",
+     xlab = "Body mass (g)",
+     col = "lightpink", border = "white")
+abline(v = mean(torgersen_data$body_mass_g, na.rm = TRUE),
+       col = "red", lwd = 2)
+```
+
