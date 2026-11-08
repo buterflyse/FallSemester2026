@@ -1,0 +1,92 @@
+---
+title: "Homework: One Airline and Extreme Delays"
+author: "Buterflyse"
+output: html_document
+---
+
+Keep `flights.csv` in the same folder. Complete the chunks and knit to Word. Arrival delays are in minutes; negative values mean early arrivals.
+
+## Starting code: identify the airline with the outlier
+
+```{r identify-airline}
+flights <- read.csv("flights.csv", na.strings = c("NA", ""))
+flights$airline[which(flights$arrival_delay == 1272)]
+```
+
+## 1. Filter the airline - DONE FOR YOU
+
+It seems HA is the airline with the large outlier. Filter `flights` to keep only the airline identified above. Save the data frame as `airline_data`. Select its `arrival_delay` column as a vector named `delay` and exclude any missing values from that vector.
+
+```{r task-1}
+airline_data <- flights[flights$airline == "HA", ]
+delay <- airline_data$arrival_delay
+delay <- delay[!is.na(delay)]
+sum(length(delay))
+```
+
+## 2. Calculate statistics
+
+Calculate the mean, median, and sample standard deviation of `delay`.
+
+```{r task-2}
+mean(delay)
+median(delay)
+sd(delay)
+```
+
+## 3. Create a histogram
+
+Create a histogram of `delay` with a title and an axis label showing minutes.
+
+```{r task-3}
+hist(delay,
+     main = "Delayed flights for the airline: HA",
+     xlab = "Delay minutes")
+```
+
+## 4. Find quartiles and fences
+
+Display the quartiles and IQR. Calculate the lower and upper 1.5-IQR fences.
+
+```{r task-4}
+q1 <- quantile(delay, 0.25)
+q3 <- quantile(delay, 0.75)
+q1 
+q3
+IQR(delay)
+
+lower_fence <- q1 - (1.5*IQR(delay))
+upper_fence <- q3 + (1.5*IQR(delay))
+lower_fence
+upper_fence
+
+```
+
+## 5. Exclude flagged outliers
+
+Using the original fences, keep values between the fences, including the endpoints. Save them as `delay_kept`. Display how many values were excluded. Keep the original `delay` vector.
+
+```{r task-5}
+delay_kept <- delay[delay >= lower_fence & delay <= upper_fence]
+sum(length(delay_kept))
+```
+
+## 6. Calculate the new statistics
+
+Calculate the mean, median, sample standard deviation, and quartiles of `delay_kept`.
+
+```{r task-6}
+mean(delay_kept)
+median(delay_kept)
+sd(delay_kept)
+kq1 <- quantile(delay_kept, 0.25)
+kq3 <- quantile(delay_kept, 0.75)
+kq1
+kq3
+```
+
+## 7. Explain your findings
+
+How did the mean, median, SD, and quartiles change after excluding the flagged values? Which summaries were most affected? Write a at least 150 word summary explaining your observations.
+
+Your answer: The mean went from 28.08 to -3.51, the median went from -6 to -7 and the standard deviation shifted from 220.87 to 20.96 which was the largest of the changes. The first quartile went from -63.5 to -18 and the third quartile went from 60.5 to 8.0. I found it very interesting that when we went from all of the numbers within the airline HA that were not na to all of the numbers within the airline HA that were within the original fences, we only dropped down by 2 numbers as the original sum of the length of delay where the airline is HA was 34 and then it dropped down to 32 once everything outside the lower and upper fences was removed. Considering how drastically the first quartile rose from -63.5 to -18 and how the mean went from positive 28 to negative 3, it is safe to assume that the two original outliers are very extreme and cause the numbers to skew in a direction that accounts for more poisitve numbers than there really are. According to the Mean, we can see that it is most likely that the extreme numbers were extreme in the positive direction and the standard deviation changing so significantly means that these outliers were the reason that there was so much variability.
