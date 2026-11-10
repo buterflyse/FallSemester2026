@@ -1,8 +1,8 @@
 /*
- * Name: Michael Galva
+ * Name: Buterflyse
  * Date: 10/30/2026
  * Class: CompSci 125
- * Prof: S. Weiss
+ * Prof: REDACTED
  * Description: This class contains a constructor method that allows individuals to use this class as a digital clock that they can manually set and manually advance. Pt.1.
  */
 

@@ -1,8 +1,8 @@
 /*
- * Name: Michael Galva
+ * Name: Buterflyse
  * Date: 10/30/2026
  * Class: CompSci 125
- * Prof: S. Weiss
+ * Prof: REDACTED
  * Description: This class allows me to test all of the methods in the class DigitalTime. Pt.2.
  */
 
