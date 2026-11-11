@@ -1,0 +1,108 @@
+---
+title: "From Tiles to Sample Means"
+subtitle: "DATA 200: Introduction to Data Science"
+output: html_document
+---
+
+Imagine a box of 100 tiles. Ten tiles say 1, ten say 2, and so on up to 10. We will look at all the tile values, then see what happens when we draw a handful and keep only its average. Run each chunk in order and follow the matching numbers on the worksheet.
+
+### 1. Look at the whole box
+
+Make a bar plot with `table()` and `barplot()`. Calculate the mean and SD of the tile values.
+
+```{r whole-box}
+tiles <- rep(1:10, each = 10)
+temp <- table(tiles)
+temp
+# Make a bar plot of the tile counts.
+barplot(temp,
+        main = "Tile Counts",
+        xlab = "tiles",
+        col = "blue")
+# Find the mean and SD of the tile values.
+mean(tiles)
+sd(tiles)
+```
+
+### 2. Draw one sample
+
+Run the chunk. Write the four values you actually drew on the worksheet.
+
+```{r one-draw}
+set.seed(200)
+n <- 4
+picked <- sample(tiles, size = n, replace = FALSE)
+picked
+```
+
+### 3. Turn that sample into one mean
+
+Average your four values on paper, then check your answer with R.
+
+```{r one-mean}
+# Calculate the mean of picked.
+mean(picked)
+```
+
+### 4. Repeat the draw
+
+Start with 200 repetitions. Each repetition starts with the full box, draws four tiles, and saves their mean. Run the chunk and read the first six results.
+
+```{r many-draws}
+repeats <- 200
+
+sample_means <- replicate(repeats, {
+  draw <- sample(tiles, size = n, replace = FALSE)
+  mean(draw)
+})
+
+head(sample_means)
+```
+
+### 5. Plot the sample means
+
+Use all of `sample_means` to make a histogram. Use `breaks = seq(1, 10, by = 0.5)` and `xlim = c(1, 10)` so both runs use the same bins and scale.
+
+```{r histogram}
+# Make a histogram of sample_means.
+hist(sample_means,
+     breaks = seq(1, 10, by = 0.5),
+     xlim = c(1,10),
+     main = "Sample Means",
+     xlab = "Mean Values",
+     col = "orange")
+```
+
+### 6. Find the center and spread of the means
+
+Calculate the mean and SD of `sample_means`. Compare these with the whole-box results.
+
+```{r center-spread}
+# Find the mean and SD of sample_means.
+mean(sample_means)
+sd(sample_means)
+```
+
+### 7. Use 16 tiles per sample
+
+Predict what will happen to the center and spread. Run the new simulation with the same number of repetitions. Plot and summarize the new means.
+
+```{r larger-samples}
+n <- 16
+
+sample_means_16 <- replicate(repeats, {
+  draw <- sample(tiles, size = n, replace = FALSE)
+  mean(draw)
+})
+
+# Make a histogram of sample_means_16 using the same bins and x-axis.
+hist(sample_means_16,
+     breaks = seq(1, 10, by = 0.5),
+     xlim = c(1,10),
+     main = "Sample Means",
+     xlab = "Mean Values",
+     col = "orange")
+# Find the mean and SD of sample_means_16.
+mean(sample_means_16)
+sd(sample_means_16)
+```
